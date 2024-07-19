@@ -1,6 +1,10 @@
 # Alerts Slack Bot
 
-### Ran Using Ngrok for Development:
+## Ideas
+- List of ideas to be implemented in the future
+- [Link](Ideas.md)
+
+## Ran Using Ngrok for Development:
 
 #### Run the slack bot (Running on port 5001)
 ```
