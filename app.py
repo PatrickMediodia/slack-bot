@@ -1,16 +1,17 @@
 import os
-# Use the package we installed
+import time
+import threading
 from slack_bolt import App
 from slack_sdk import WebClient
 
-# Initialize your app with your bot token and signing secret
 app = App(
     token=os.environ.get("SLACK_BOT_TOKEN"),
     signing_secret=os.environ.get("SLACK_SIGNING_SECRET")
 )
 
-client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
+PORT = int(os.environ.get("PORT", 5001))
 channel_id = os.environ.get("CHANNEL_ID")
+client = WebClient(token=os.environ.get("SLACK_BOT_TOKEN"))
 
 @app.event("message")
 def reply_message(event, say):
@@ -30,16 +31,37 @@ def reply_message(event, say):
     )
 
 def send_message(message):
+    #tail log files
     try:
         result = client.chat_postMessage(
             channel=channel_id,
             text=message
-            # You could also use a blocks[] array to send richer content
         )
-        # Print result, which includes information about the message (like TS)
         print(result)
     except Exception as e:
         print(e)
 
+    #mocked log file output values
+    time.sleep(10)
+    send_message(message)
+
 if __name__ == "__main__":
-    app.start(port=int(os.environ.get("PORT", 5001)))
+    #start thread for sending tailed log files
+    send_thread = threading.Thread(
+        target=send_message,
+        args=['hello'],
+        daemon=True
+    )
+
+    # thread for listening to user commands
+    listen_thread = threading.Thread(
+        target=app.start,
+        args=[PORT],
+        daemon=True
+    )
+
+    listen_thread.start()
+    send_thread.start()
+
+    while True:
+        continue
